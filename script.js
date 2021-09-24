@@ -1,60 +1,62 @@
-function setup() {
-	createCanvas(500, 400);
+var [px, py, pvx] = [410, 675, 0];
+
+class Player {
+        constructor(name, x, y, vx, height, width) {
+        this.name = name;
+        this.x = x;
+        this.y = y;
+        this.vx = vx;
+        this.height = height;
+        this.width = width;
+    }
 }
 
-var [xpos, ypos, xspeed, yspeed] = [225, 225, 0, 0];
+// class Enemy {
+//     constructor(height, width, )
+// }
+
+// class Bullet {
+//  confirm
+// }
+
+function setup() {
+    createCanvas(920, 720);
+
+}
 
 function draw() {
-	background(225);
-	
-	fill(0);
-	text("Use the arrow keys (or WASD) to move the square around", 25, 25);
-	
-	fill(0, 255, 0);
-	rect(xpos, ypos, 50, 50);
-	
-	if(xpos >= 0 && xpos + 50 <= 500) xpos += xspeed;
-	if(ypos >= 0 && ypos + 50 <= 500) ypos += yspeed;
+    background(0);
+
+    fill(0, 255, 0);
+    rect(px, py, 50, 10);
+    if (px > 850) {
+        px = 850
+    } else if (px < 20) {
+        px = 20;
+    } else {
+        px = px - pvx
+    }
 }
 
 function keyPressed() {
-	switch(keyCode) {
-		case 37:
-		case 65:
-			xspeed = -2;
-			break;
-		case 39:
-		case 68:
-			xspeed = 2;
-			break;
-		case 38:
-		case 87:
-			yspeed = -2;
-			break;
-		case 40:
-		case 83:
-			yspeed = 2;
-			break;
-	}
+    switch(keyCode) {
+        case 37:
+            pvx = 8;
+            break;
+        case 39:
+            pvx = -8;
+            break;
+    }
 }
 
 function keyReleased() {
-	switch(keyCode) {
-		case 37:
-		case 65:
-			xspeed = 0;
-			break;
-		case 39:
-		case 68:
-			xspeed = 0;
-			break;
-		case 38:
-		case 87:
-			yspeed = 0;
-			break;
-		case 40:
-		case 83:
-			yspeed = 0;
-			break;
-	}
+    switch(keyCode) {
+        case 37:
+            pvx = 0;
+            break;
+        case 39:
+            pvx = 0;
+            break;
+    }
 }
+
