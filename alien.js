@@ -1,0 +1,3 @@
+function Alien(x, y) { 
+
+}

@@ -1,27 +1,9 @@
 var [px, py, pvx] = [410, 675, 0];
-
-class Player {
-        constructor(name, x, y, vx, height, width) {
-        this.name = name;
-        this.x = x;
-        this.y = y;
-        this.vx = vx;
-        this.height = height;
-        this.width = width;
-    }
-}
-
-// class Enemy {
-//     constructor(height, width, )
-// }
-
-// class Bullet {
-//  confirm
-// }
+var bullets = [];
+var fire
 
 function setup() {
     createCanvas(920, 720);
-
 }
 
 function draw() {
@@ -36,6 +18,13 @@ function draw() {
     } else {
         px = px - pvx
     }
+
+
+    for (var i = bullets.length-1; i >= 0; i--) {
+        if (bullets[i].toDelete) {
+            bullets.splice(i, 1);
+        }
+    }
 }
 
 function keyPressed() {
@@ -45,6 +34,11 @@ function keyPressed() {
             break;
         case 39:
             pvx = -8;
+            break;
+        case 32:
+            var bullet = new Bullet(px, height);
+            bullets.push(bullet);
+            console.log(bullets)
             break;
     }
 }
