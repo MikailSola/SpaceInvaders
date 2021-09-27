@@ -20,9 +20,15 @@ function draw() {
     }
 
 
-    for (var i = bullets.length-1; i >= 0; i--) {
-        if (bullets[i].toDelete) {
-            bullets.splice(i, 1);
+
+    for (var i = 0; i < bullets.length; i++) {
+        bullets[i].show();
+        bullets[i].move();
+        for (var j = 0; j < invaders.length; j++) {
+            if (bullets[i].hits(invaders[j])) {
+                invaders[j].grow();
+                bullets[i].evaporate();
+            }
         }
     }
 }
@@ -36,7 +42,7 @@ function keyPressed() {
             pvx = -8;
             break;
         case 32:
-            var bullet = new Bullet(px, height);
+            var bullet = new Bullet(px, py, 3, false);
             bullets.push(bullet);
             console.log(bullets)
             break;
