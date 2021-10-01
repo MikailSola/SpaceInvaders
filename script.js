@@ -1,6 +1,6 @@
 var [px, py, pvx] = [410, 675, 0];
 var bullets = [];
-var fire
+var fire;
 
 function setup() {
     createCanvas(920, 720);
@@ -19,17 +19,9 @@ function draw() {
         px = px - pvx
     }
 
-
-
     for (var i = 0; i < bullets.length; i++) {
-        bullets[i].show();
         bullets[i].move();
-        for (var j = 0; j < invaders.length; j++) {
-            if (bullets[i].hits(invaders[j])) {
-                invaders[j].grow();
-                bullets[i].evaporate();
-            }
-        }
+        bullets[i].draw();
     }
 }
 
@@ -44,7 +36,6 @@ function keyPressed() {
         case 32:
             var bullet = new Bullet(px, py, 3, false);
             bullets.push(bullet);
-            console.log(bullets)
             break;
     }
 }

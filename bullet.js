@@ -1,32 +1,16 @@
 class Bullet {
-    constructor(x, y, r, toDelete) {
+    constructor(x, y) {
         this.x = x;
         this.y = y;
-        this.r = 3;
-        this.toDelete = false;
     }
 
-    move() {
+    draw() {
         noStroke();
         fill(150, 0, 255);
-        ellipse(this.x, this.y, this.r*2, this.r*2);
-    }
-
-    evaporate() {
-        this.toDelete = true;
-    }
-
-    hits() {
-        var d = dist(this.x, this.y, invader.x, invader.y);
-        if (d < this.r + invader.r) {
-            return true;
-        } else {
-            return false;
-        }
+        ellipse(this.x, this.y, 3, 3);
     }
 
     move() {
         this.y = this.y - 5;
-    
     }
 }
