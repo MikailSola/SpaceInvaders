@@ -6,7 +6,7 @@ class Bullet {
 
     draw() {
         noStroke();
-        fill(150, 0, 255);
+        fill(255);
         ellipse(this.x, this.y, 3, 3);
     }
 

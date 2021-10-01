@@ -19,10 +19,12 @@ function draw() {
         px = px - pvx
     }
 
-    for (var i = 0; i < bullets.length; i++) {
-        bullets[i].move();
-        bullets[i].draw();
-    }
+    console.log(bullets);
+
+    bullets.forEach((b) =>{
+        b.move();
+        b.draw();
+    });   
 }
 
 function keyPressed() {
