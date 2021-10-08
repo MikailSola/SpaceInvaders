@@ -1,55 +1,68 @@
-var [px, py, pvx] = [410, 675, 0];
+var ship
+var aliens = [];
 var bullets = [];
-var fire;
+
+function preload() {
+    invader1a = loadImage('images/invader1a.png');
+    invader1b = loadImage('images/invader1b.png');
+}
 
 function setup() {
     createCanvas(920, 720);
+    ship = new Ship();
+    for (var i = 0; i < 9; i++) {
+        var alien
+        alien = new Alien((i*70)+80, 60, invader1b);
+        aliens.push(alien);
+    } for (var i = 0; i < 9; i++) {
+        var alien
+        alien = new Alien((i*70)+80, 120, invader1a);
+        aliens.push(alien);
+    } 
 }
 
 function draw() {
     background(0);
+    ship.draw();
 
-    fill(0, 255, 0);
-    rect(px, py, 50, 10);
-    if (px > 850) {
-        px = 850
-    } else if (px < 20) {
-        px = 20;
-    } else {
-        px = px - pvx
+    for (var i = 0; i < bullets.length; i++) {
+        bullets[i].draw();
+        bullets[i].move();
+        for (var j = 0; j < aliens.length; j++) {
+            if (bullets[i].collision(aliens[j])) {
+                aliens[j].destroy();
+                bullets[i].destroy();
+            }
+        }
     }
 
-    console.log(bullets);
+    for (var i = 0; i < aliens.length; i++) {
+        aliens[i].draw();
+        aliens[i].move();
+    }
 
-    bullets.forEach((b) =>{
-        b.move();
-        b.draw();
-    });   
+    for (var i = bullets.length-1; i >= 0; i--) {
+        if (bullets[i].toDelete) {
+            bullets.splice(i, 1);
+        }
+    }
+
+    for (var i = aliens.length-1; i >= 0; i--) {
+        if (aliens[i].toDelete) {
+            aliens.splice(i, 1);
+        }
+    }
 }
 
 function keyPressed() {
-    switch(keyCode) {
-        case 37:
-            pvx = 8;
-            break;
-        case 39:
-            pvx = -8;
-            break;
-        case 32:
-            var bullet = new Bullet(px, py, 3, false);
-            bullets.push(bullet);
-            break;
+    if (key === ' ') {
+        var bullet = new Bullet(ship.x, 690);
+        bullets.push(bullet);
+    }
+
+    if (keyCode === LEFT_ARROW) {
+        ship.move(-1);
+    } else if (keyCode === RIGHT_ARROW) {
+        ship.move(1);
     }
 }
-
-function keyReleased() {
-    switch(keyCode) {
-        case 37:
-            pvx = 0;
-            break;
-        case 39:
-            pvx = 0;
-            break;
-    }
-}
-
