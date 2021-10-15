@@ -1,20 +1,32 @@
 var ship
 var shipv
-var menu
-var gamestate = 0; // 0 = start, 1 = game, 2 = win, 3 = gameover
+var song;
+var currentSong;
+var songplay = 0;
+var gamestate = 0; // 0 = start, 1 = game, 2 = win, 3 = gameover, 4 = menu
 var aliens = [];
 var alienBullets = [];
 var bullets = [];
 var walls = [];
-var randomDelay;
 
 function preload() {
+    // IMAGES
     imgInvader1a = loadImage('images/invader1a.png');
     imgInvader1b = loadImage('images/invader1b.png');
     imgPlay = loadImage('images/play.png');
+    imgMenu = loadImage('images/menu.png');
+    imgBG = loadImage('images/bg.png');
     imgWall = loadImage('images/wall.png');
     imgLose = loadImage('images/youlose.png');
     imgWin = loadImage('images/youwin.png');
+    imgShip = loadImage('images/ship.png');
+
+    // SOUNDS
+    gameSong = loadSound('sounds/song.mp3');
+    menuSong = loadSound('sounds/menusong.mp3');
+    startupSong = loadSound('sounds/startup.mp3');
+    victorySong = loadSound('sounds/victory.mp3');
+    gameoverSong = loadSound('sounds/gameover.mp3');
 }
 
 function setup() {
@@ -37,14 +49,16 @@ function setup() {
 
 function draw() {
     background(0);
-    if (gamestate == 0) {
-        menu();
-    } else if (gamestate == 1) {
+    if (gamestate === 0) {
+        start();
+    } else if (gamestate === 1) {
         game();
-    } else if (gamestate == 2) {
+    } else if (gamestate === 2) {
         win();
-    } else if (gamestate == 3) {
+    } else if (gamestate === 3) {
         gameover();
+    } else if (gamestate === 4) {
+        menu();
     }
 }
 
@@ -54,31 +68,73 @@ function randomAlien() {
     alienBullets.push(alienBullet);
 }
 
-
-
-function menu() {
+function start() {
     imageMode(CENTER);
     image(imgPlay, 460, 340, 400, 100);
+    if (songplay != 1) {
+        startupSong.play();
+        currentSong = startupSong
+        songplay = 1;
+    }
 }
 
 function win() {
     imageMode(CENTER);
     image(imgWin, 460, 340, 416, 416);
+    if (songplay === 3) {
+        currentSong.stop();
+        victorySong.play();
+        currentSong = victorySong;
+        currentSong.setVolume(0.3);
+        songplay = 1;
+    }
 }
 
 function gameover() {
     imageMode(CENTER);
     image(imgLose, 460, 340, 500, 500);
+    if (songplay === 3) {
+        currentSong.stop();
+        gameoverSong.play();
+        currentSong = gameoverSong;
+        currentSong.setVolume(0.5);
+        songplay = 1;
+    }
+}
+
+function menu() {
+    imageMode(CENTER);
+    image(imgMenu, width / 2, height / 2, width, height + 2);
+    if (songplay === 1) {
+        currentSong.stop();
+        menuSong.play();
+        currentSong = menuSong;
+        currentSong.setVolume(1);
+        songplay = 2;
+    }
 }
 
 function game() {
+    image(imgBG, width / 2, height / 2, width, height + 2);
     ship.draw();
-
-    if (aliens != []) {
-        if (frameCount % 20 == 0) {
-            randomAlien();
-        }
+    if (songplay === 2) {
+        currentSong.stop();
+        gameSong.play();
+        currentSong = gameSong;
+        currentSong.setVolume(0.6);
+        songplay = 3;
     }
+
+    try {
+        if (aliens != []) {
+            if (frameCount % 20 == 0) {
+                randomAlien();
+            }
+        }
+    } catch (error) {
+        gamestate = 2;
+    }
+
 
 
     if (keyIsDown(LEFT_ARROW)) {
@@ -108,6 +164,11 @@ function game() {
     for (var i = 0; i < aliens.length; i++) {
         aliens[i].draw();
         aliens[i].move();
+        for (var j = 0; j < walls.length; j++) {
+            if (aliens[i].collision(walls[j])) {
+                gamestate = 3;
+            }
+        }
     }
 
     for (var i = 0; i < walls.length; i++) {
@@ -122,7 +183,7 @@ function game() {
                 walls[j].destroy();
                 alienBullets[i].destroy();
             }
-        } if (alienBullet.collision(ship)) {
+        } if (alienBullets[i].collision(ship)) {
             gamestate = 3;
         }
     }
@@ -148,11 +209,25 @@ function game() {
 
 function keyPressed() {
     if (key === ' ') {
-        var bullet = new Bullet(ship.x, 690);
-        bullets.push(bullet);
+        if (bullets.length != 3) {
+            var bullet = new Bullet(ship.x, 690);
+            bullets.push(bullet);
+        }
     }
 
     if (keyCode === 13) {
-        gamestate = 1;
+        if (gamestate === 0) {
+            gamestate = 4;
+        } else if (gamestate === 4) {
+            gamestate = 1;
+        } else if (gamestate === 2 || gamestate === 3) {
+            gamestate = 4;
+            aliens = [];
+            alienBullets = [];
+            bullets = [];
+            walls = [];
+            setup();
+        }
+
     }
 }

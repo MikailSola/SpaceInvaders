@@ -29,5 +29,8 @@ class Bullet {
 
     move() {
         this.y = this.y - 5;
+        if (this.y < -5) {
+            this.toDelete = true;
+        }
     }
 }
