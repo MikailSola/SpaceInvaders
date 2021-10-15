@@ -2,6 +2,11 @@ var ship
 var shipv
 var song;
 var currentSong;
+var currentscore = 0;
+var highscore = 0;
+var time = 50;
+var finaltime;
+var timebonus = 0;
 var songplay = 0;
 var gamestate = 0; // 0 = start, 1 = game, 2 = win, 3 = gameover, 4 = menu
 var aliens = [];
@@ -11,22 +16,27 @@ var walls = [];
 
 function preload() {
     // IMAGES
-    imgInvader1a = loadImage('images/invader1a.png');
-    imgInvader1b = loadImage('images/invader1b.png');
-    imgPlay = loadImage('images/play.png');
-    imgMenu = loadImage('images/menu.png');
-    imgBG = loadImage('images/bg.png');
-    imgWall = loadImage('images/wall.png');
-    imgLose = loadImage('images/youlose.png');
-    imgWin = loadImage('images/youwin.png');
-    imgShip = loadImage('images/ship.png');
+    imgInvader1a = loadImage('media/images/invader1a.png');
+    imgInvader1b = loadImage('media/images/invader1b.png');
+    imgPlay = loadImage('media/images/play.png');
+    imgMenu = loadImage('media/images/menu.png');
+    imgBG = loadImage('media/images/bg.png');
+    imgWall = loadImage('media/images/wall.png');
+    imgLose = loadImage('media/images/youlose.png');
+    imgWin = loadImage('media/images/youwin.png');
+    imgShip = loadImage('media/images/ship.png');
 
     // SOUNDS
-    gameSong = loadSound('sounds/song.mp3');
-    menuSong = loadSound('sounds/menusong.mp3');
-    startupSong = loadSound('sounds/startup.mp3');
-    victorySong = loadSound('sounds/victory.mp3');
-    gameoverSong = loadSound('sounds/gameover.mp3');
+    gameSong = loadSound('media/sounds/song.mp3');
+    menuSong = loadSound('media/sounds/menusong.mp3');
+    startupSong = loadSound('media/sounds/startup.mp3');
+    victorySong = loadSound('media/sounds/victory.mp3');
+    gameoverSong = loadSound('media/sounds/gameover.mp3');
+    shootSFX = loadSound('media/sounds/shoot.mp3');
+    alienSFX = loadSound('media/sounds/aliendead.mp3')
+
+    // FONT 
+    customFont = loadFont('media/pressstart.otf');
 }
 
 function setup() {
@@ -88,6 +98,29 @@ function win() {
         currentSong.setVolume(0.3);
         songplay = 1;
     }
+    if (timebonus === 0) {
+        finaltime = time;
+        timebonus = 1;
+    }
+    textFont(customFont);
+    fill(255, 255, 255);
+    textAlign(CENTER);
+    textSize(20);
+    let c = currentscore.toString();
+    let h = highscore.toString();
+    let t = finaltime.toString();
+    text("Timebonus: " + (t) + " x 10 = " + (t * 10), width / 2, (height / 2) + 100);
+    if (timebonus === 1) {
+        currentscore = currentscore + (finaltime * 10);
+        timebonus = 2;
+    }
+    if (currentscore > highscore) {
+        highscore = currentscore;
+    }
+    text("Score: " + (c), width / 2, (height / 2) + 140);
+    text("Highscore: " + (h), width / 2, (height / 2) + 180);
+    textSize(12);
+    text("Press enter to continue!", width / 2, height - 50);
 }
 
 function gameover() {
@@ -100,6 +133,18 @@ function gameover() {
         currentSong.setVolume(0.5);
         songplay = 1;
     }
+
+    textAlign(CENTER);
+    textFont(customFont);
+    fill(255, 255, 255);
+    textSize(20);
+    let c = currentscore.toString();
+    let h = highscore.toString();
+    let t = time.toString();
+    text("Score: " + (c), width / 2, (height / 2) + 100);
+    text("Highscore: " + (h), width / 2, (height / 2) + 140);
+    textSize(12);
+    text("Press enter to return to menu!", width / 2, height - 50);
 }
 
 function menu() {
@@ -114,15 +159,33 @@ function menu() {
     }
 }
 
+function score() {
+    textAlign(LEFT);
+    textFont(customFont);
+    fill(255, 255, 255);
+    textSize(12);
+    let c = currentscore.toString();
+    let h = highscore.toString();
+    let t = time.toString();
+    text("Score: " + (c), 20, 25);
+    text("Highscore: " + (h), 20, 45);
+    text("Time: " + (t), 20, 75)
+}
+
 function game() {
     image(imgBG, width / 2, height / 2, width, height + 2);
     ship.draw();
+
     if (songplay === 2) {
         currentSong.stop();
         gameSong.play();
         currentSong = gameSong;
         currentSong.setVolume(0.6);
         songplay = 3;
+    }
+
+    if (frameCount % 60 == 0) {
+        time = time - 1;
     }
 
     try {
@@ -203,8 +266,16 @@ function game() {
     for (var i = aliens.length - 1; i >= 0; i--) {
         if (aliens[i].toDelete) {
             aliens.splice(i, 1);
+            alienSFX.setVolume(0.3);
+            alienSFX.play();
+            currentscore = currentscore + 100;
+            if (currentscore > highscore) {
+                highscore = currentscore;
+            }
         }
     }
+
+    score();
 }
 
 function keyPressed() {
@@ -212,6 +283,8 @@ function keyPressed() {
         if (bullets.length != 3) {
             var bullet = new Bullet(ship.x, 690);
             bullets.push(bullet);
+            shootSFX.setVolume(0.3);
+            shootSFX.play();
         }
     }
 
@@ -221,11 +294,21 @@ function keyPressed() {
         } else if (gamestate === 4) {
             gamestate = 1;
         } else if (gamestate === 2 || gamestate === 3) {
-            gamestate = 4;
+            if (gamestate === 3) {
+                currentscore = 0;
+                gamestate = 4;
+            } else {
+                gamestate = 1;
+                songplay = 2;
+            }
+
             aliens = [];
             alienBullets = [];
             bullets = [];
             walls = [];
+            time = 50;
+            timebonus = 0;
+
             setup();
         }
 

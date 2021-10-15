@@ -5,7 +5,6 @@ class AlienBullet {
         this.y = y
     }
 
-
     collision(bullet) {
         if (this.x > bullet.x - bullet.w &&
             this.x < bullet.x + bullet.w &&

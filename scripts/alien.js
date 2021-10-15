@@ -30,16 +30,20 @@ class Alien {
 
     move() {
         if (this.x < 79) {
-            this.x = this.x + 4
+            this.x = 80
             this.y = this.y + 40;
             this.v = this.v * -1;
 
         } else if (this.x > (width - 79)) {
-            this.x = this.x - 4
+            this.x = width - 80
             this.y = this.y + 40;
             this.v = this.v * -1;
         } else {
-            this.x = this.x + this.v;
+            if (aliens.length > 5) {
+                this.x = this.x + this.v;
+            } else {
+                this.x = this.x + (this.v * 2);
+            }
         }
     }
 }
